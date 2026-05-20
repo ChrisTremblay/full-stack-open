@@ -1,19 +1,18 @@
-import { eq } from "drizzle-orm"
+import { eq, ilike, desc } from "drizzle-orm"
 import { db } from "../../db"
 import { blogs } from "../../db/schema"
 
 export const getBlogs = async (title?: string) => {
-  const where =
-    title
-      ? (blogs, { ilike }) =>
-          ilike(blogs.title, `%${title}%`)
-      : undefined
   return db.query.blogs.findMany({
-    where,
-    orderBy: (blogs, { desc }) => [
-      desc(blogs.likes),
+    where: title
+      ? (table, { ilike }) =>
+          ilike(table.title, `%${title}%`)
+      : undefined,
+    orderBy: (table, { desc }) => [
+      desc(table.likes),
     ],
   })
+
 }
 
 export const addBlog = async (content: string, author: string, title: string, url: string, likes: number) => {
