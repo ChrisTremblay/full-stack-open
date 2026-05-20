@@ -8,11 +8,7 @@ const Blogs = async({
 }) => {
 
   const { title } = await searchParams
-  const blogs = getBlogs()
-  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
-  const filteredBlogs = title
-    ? sortedBlogs.filter((blog) => blog.title.toLowerCase().includes(title.toLowerCase()))
-    : sortedBlogs
+  const blogs = await getBlogs(title)
 
   return (
     <div>
@@ -27,7 +23,7 @@ const Blogs = async({
           <button type="submit">Search</button>
         </form>
       <ul>
-        {filteredBlogs.map(blog => (
+        {blogs.map(blog => (
             <div key={blog.id}>
                 <h3>{blog.title} - by {blog.author}</h3>
                 <a href={blog.url}>Link to original post</a>

@@ -1,26 +1,37 @@
-const blogs = [
-    { id: 1, author: "Chris", title: "The best blog", url:"https://courses.mooc.fi/org/uh-cs/courses/full-stack-open-nextjs/chapter-2", likes:20, content:"This is the best blog ever created" },
-    { id: 2, author: "Martin", title: "How to write a bad blog", url:"https://courses.mooc.fi/org/uh-cs/courses/full-stack-open-nextjs/chapter-1", likes:0, content:"Copy Chris" },
-    { id: 3, author: "Sarah", title: "Let's end blogs forever", url:"https://courses.mooc.fi/org/uh-cs/courses/full-stack-open-nextjs/chapter-3", likes:10000, content:"Who ready blog nowadays anyways, there's no ways" },
-]
+import { eq } from "drizzle-orm"
+import { db } from "../../db"
+import { blogs } from "../../db/schema"
 
-let nextId = 4
-
-export const getBlogs = () => {
-  return blogs
+export const getBlogs = async (title?: string) => {
+  const where =
+    title
+      ? (blogs, { ilike }) =>
+          ilike(blogs.title, `%${title}%`)
+      : undefined
+  return db.query.blogs.findMany({
+    where,
+    orderBy: (blogs, { desc }) => [
+      desc(blogs.likes),
+    ],
+  })
 }
 
-export const addBlog = (content: string, author: string, title: string, url: string, likes: number) => {
-  blogs.push({ id: nextId++, author, title, url, likes, content })
+export const addBlog = async (content: string, author: string, title: string, url: string, likes: number) => {
+  await db.insert(blogs).values({author, title, url, likes, content})
 }
 
-export const getBlogById = (id: number) => {
-  return blogs.find((blog) => blog.id === id)
+export const getBlogById = async (id: number) => {
+  return db.query.blogs.findFirst({
+    where: eq(blogs.id, id),
+  })
 }
 
-export const increaseLikes = (id: number) => {
-  const blog = blogs.find((blog) => blog.id === id)
+export const increaseLikes = async (id: number) => {
+  const blog = await getBlogById(id)
   if (blog) {
-    blog.likes = blog.likes + 1
+    await db
+      .update(blogs)
+      .set({likes: blog.likes+1})
+      .where(eq(blogs.id, id))
   }
 }
