@@ -1,11 +1,10 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getUserById, getBlogsByUserId } from "../../services/users"
+import { getUserWithBlogs } from "../../services/users"
 
-const UserPage = async ({ params }: { params: Promise<{ id: string }> }) => {
-  const { id } = await params
-  const user = await getUserById(Number(id))
-  const blogs = await getBlogsByUserId(Number(id))
+const UserPage = async ({ params }: { params: Promise<{ username: string }> }) => {
+  const { username } = await params
+  const user = await getUserWithBlogs(String(username))
 
   if (!user) {
     notFound()
@@ -17,7 +16,7 @@ const UserPage = async ({ params }: { params: Promise<{ id: string }> }) => {
       <p>Username: {user.username}</p>
       <h3>Blogs</h3>
       <ul>
-        {blogs.map((blog) => (
+        {user.blogs.map((blog) => (
           <li key={blog.id}>
             <Link href={`/blogs/${blog.id}`}>{blog.content}</Link>
           </li>
