@@ -20,6 +20,7 @@ export const getBlogsByUsername = async (username: string) => {
     where: eq(blogs.userId, user.id),
   })
 }
+
 export const getUserWithBlogs = async (username: string) => {
   return db.query.users.findFirst({
     where: eq(users.username, username),

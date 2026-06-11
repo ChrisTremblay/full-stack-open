@@ -19,6 +19,9 @@ export const addBlog = async (content: string, author: string, title: string, ur
   const user = await db.query.users.findFirst({
     orderBy: sql`RANDOM()`,
   })
+    if (!user) {
+    throw new Error("No user found in database")
+  }
   await db.insert(blogs).values({author, title, url, likes, content, userId:user.id})
 }
 
