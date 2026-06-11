@@ -7,8 +7,9 @@ export const blogs = pgTable("blogs", {
   title: text("title").notNull(),
   url: text("url").notNull(),
   likes: integer("likes").notNull().default(0),
-  userId: integer("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").references(() => users.id),
 })
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
